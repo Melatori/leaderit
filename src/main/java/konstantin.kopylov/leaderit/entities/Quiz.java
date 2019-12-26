@@ -16,8 +16,7 @@ public class Quiz {
     private Date endDate;
     private boolean active;
     @OneToMany(mappedBy = "quiz",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            cascade = CascadeType.ALL)
     private List<QuizQuestion> questions = new ArrayList<>();
 
     public Long getId() {

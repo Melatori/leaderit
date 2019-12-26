@@ -37,12 +37,14 @@ public class QuizController {
     public ResponseEntity<Quiz> updateQuiz(@PathVariable("id") long id, @RequestBody Quiz quiz) {
         Optional<Quiz> searchResult = quizRepository.findById(id);
 
-        //todo: creates new tuple instead updating exists
         return searchResult.map(foundQuiz -> {
             System.out.println("found");
-            foundQuiz = quiz;
-            return ResponseEntity.ok().body(foundQuiz);
-//            return ResponseEntity.ok().body(quizRepository.save(foundQuiz));
+            foundQuiz.setName(quiz.getName());
+            foundQuiz.setStartDate(quiz.getStartDate());
+            foundQuiz.setEndDate(quiz.getEndDate());
+            foundQuiz.setActive(quiz.isActive());
+            foundQuiz.setQuestions(quiz.getQuestions());
+            return ResponseEntity.ok().body(quizRepository.save(foundQuiz));
         }).orElseGet(() -> ResponseEntity.ok().body(quizRepository.save(quiz)));
     }
 
