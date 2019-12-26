@@ -3,10 +3,11 @@ package konstantin.kopylov.leaderit.controller;
 import konstantin.kopylov.leaderit.entities.Quiz;
 import konstantin.kopylov.leaderit.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.util.Iterator;
 import java.util.Optional;
 
 @RestController
@@ -17,97 +18,40 @@ public class QuizController {
     private QuizRepository quizRepository;
 
     @GetMapping
-    public Iterable<Quiz> getAllQuizzes() {
-        return quizRepository.findAll();
+    public ResponseEntity<Iterable<Quiz>> getAllQuizzes() {
+        return ResponseEntity.ok().body(quizRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public Quiz getById(@PathVariable("id") long id) {
+    public ResponseEntity<Quiz> getById(@PathVariable("id") long id) {
         Optional<Quiz> searchResult = quizRepository.findById(id);
-        if (!searchResult.isPresent()) {
-            return null;
-        }
-        return searchResult.get();
+        return searchResult.map(quiz -> ResponseEntity.ok().body(quiz)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public @ResponseBody
-    String createNewQuiz(@RequestParam String name, @RequestParam String startDate,
-                         @RequestParam String endDate, @RequestParam String activity) {
-
-        Quiz quiz = new Quiz();
-        quiz.setName(name);
-        try {
-            quiz.setStartDate(Date.valueOf(startDate));
-            quiz.setEndDate(Date.valueOf(endDate));
-        } catch (IllegalArgumentException e) {
-            return "date is incorrect";
-        }
-        if (activity.equals("true")) {
-            quiz.setActive(true);
-        }
-
-        quizRepository.save(quiz);
-
-        return "success";
+    public ResponseEntity<Quiz> createNewQuiz(@RequestBody Quiz quiz) {
+        return ResponseEntity.ok().body(quizRepository.save(quiz));
     }
 
-    @PutMapping
-    public @ResponseBody
-    String updateQuiz(@RequestParam long id,
-                      @RequestParam(required = false) String name,
-                      @RequestParam(required = false) String startDate,
-                      @RequestParam(required = false) String endDate,
-                      @RequestParam(required = false) String activity) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Quiz> updateQuiz(@PathVariable("id") long id, @RequestBody Quiz quiz) {
         Optional<Quiz> searchResult = quizRepository.findById(id);
-        if (!searchResult.isPresent()) {
-            return "not found";
-        }
-        Quiz quiz = searchResult.get();
 
-        if (name != null) {
-            quiz.setName(name);
-        }
-        if (startDate != null) {
-            Date date;
-            try {
-                date = Date.valueOf(startDate);
-            } catch (IllegalArgumentException e) {
-                return "date is incorrect";
-            }
-            quiz.setStartDate(date);
-        }
-        if (endDate != null) {
-            Date date;
-            try {
-                date = Date.valueOf(endDate);
-            } catch (IllegalArgumentException e) {
-                return "date is incorrect";
-            }
-            quiz.setStartDate(date);
-        }
-        if (activity != null) {
-            if (activity.toLowerCase().equals("true")) {
-                quiz.setActive(true);
-            } else if (activity.toLowerCase().equals("false")) {
-                quiz.setActive(false);
-            }
-        }
-
-        quizRepository.save(quiz);
-
-        return "success";
+        //todo: creates new tuple instead updating exists
+        return searchResult.map(foundQuiz -> {
+            System.out.println("found");
+            foundQuiz = quiz;
+            return ResponseEntity.ok().body(foundQuiz);
+//            return ResponseEntity.ok().body(quizRepository.save(foundQuiz));
+        }).orElseGet(() -> ResponseEntity.ok().body(quizRepository.save(quiz)));
     }
 
-    @DeleteMapping
-    public @ResponseBody
-    String deleteQuiz(@RequestParam long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteQuiz(@PathVariable("id") long id) {
         Optional<Quiz> searchResult = quizRepository.findById(id);
-        if (searchResult.isPresent()) {
+        return searchResult.map(quiz -> {
             quizRepository.deleteById(id);
-        } else {
-            return "not found";
-        }
-        return "success";
+            return new ResponseEntity<Void>(HttpStatus.OK);
+        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
