@@ -9,9 +9,4 @@ import java.util.List;
 
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
-    List<Quiz> findByName(String name);
-    List<Quiz> findByStartDate(Date date);
-    List<Quiz> findByEndDate(Date date);
-    List<Quiz> findByActive(Boolean active);
-    List<Quiz> findByNameAndStartDate(String name, Date date);
 }

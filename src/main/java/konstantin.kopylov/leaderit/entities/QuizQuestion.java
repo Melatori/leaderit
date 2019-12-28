@@ -5,19 +5,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "quiz_question")
 public class QuizQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
     private String text;
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "quiz_id", referencedColumnName = "id")
-    private Quiz quiz;
 
     @Column(name = "order_number")
     private Integer order;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "quiz_id",
+            referencedColumnName = "id",
+            nullable = false)
+    private Quiz quiz;
 
     public Long getId() {
         return id;

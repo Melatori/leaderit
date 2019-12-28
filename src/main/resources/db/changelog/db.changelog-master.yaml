@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-master.yaml
+  - changeSet:
+      id: 1
+      author: kopylov_konstantin
+      changes:
+        - createTable:
+            tableName: quiz
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: quizPK
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_date
+                  type: DATETIME(6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: DATETIME(6)
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: kopylov_konstantin
+      changes:
+        - createTable:
+            tableName: quiz_question
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: quizQuestionsPK
+              - column:
+                  name: text
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_number
+                  type: INT
+              - column:
+                  name: quiz_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: kopylov_konstantin
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: quiz_id
+            baseTableName: quiz_question
+            constraintName: question_quiz_FK
+            referencedColumnNames: id
+            referencedTableName: quiz
+            onDelete: CASCADE

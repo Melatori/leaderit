@@ -11,9 +11,14 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+    @Column(name = "start_date",
+            nullable = false)
     private Date startDate;
+    @Column(name = "end_date")
     private Date endDate;
+    @Column(nullable = false)
     private boolean active;
     @OneToMany(mappedBy = "quiz",
             cascade = CascadeType.ALL)
